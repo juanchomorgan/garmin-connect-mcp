@@ -22,6 +22,14 @@ import {
 const GARMIN_EMAIL = process.env.GARMIN_EMAIL;
 const GARMIN_PASSWORD = process.env.GARMIN_PASSWORD;
 
+console.log('ENV CHECK:', {
+  hasGarminEmail: !!GARMIN_EMAIL,
+  hasGarminPassword: !!GARMIN_PASSWORD,
+  envKeys: Object.keys(process.env).filter((k) =>
+    k.includes('GARMIN') || k.includes('RENDER') || k === 'PORT' || k === 'TEST_DEPLOY'
+  ),
+});
+
 if (!GARMIN_EMAIL || !GARMIN_PASSWORD) {
   console.error('GARMIN_EMAIL and GARMIN_PASSWORD are required');
   process.exit(1);
