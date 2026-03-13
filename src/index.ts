@@ -1,7 +1,6 @@
+import express, { type Request, type Response } from 'express';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
-import type { Request, Response } from 'express';
 
 import { GarminClient } from './client';
 import {
@@ -24,10 +23,7 @@ const GARMIN_EMAIL = process.env.GARMIN_EMAIL;
 const GARMIN_PASSWORD = process.env.GARMIN_PASSWORD;
 
 if (!GARMIN_EMAIL || !GARMIN_PASSWORD) {
-  console.error(
-    'Error: GARMIN_EMAIL and GARMIN_PASSWORD environment variables are required.\n' +
-      'Set them in your hosting provider.'
-  );
+  console.error('GARMIN_EMAIL and GARMIN_PASSWORD are required');
   process.exit(1);
 }
 
@@ -57,8 +53,14 @@ function buildServer() {
 }
 
 async function main() {
-  const app = createMcpExpressApp({ host: '0.0.0.0' });
+  const app = express();
+  app.use(express.json());
+
   const PORT = Number(process.env.PORT ?? 3000);
+
+  app.get('/health', (_req: Request, res: Response) => {
+    res.status(200).send('ok');
+  });
 
   app.post('/mcp', async (req: Request, res: Response) => {
     const server = buildServer();
@@ -77,6 +79,7 @@ async function main() {
       });
     } catch (err) {
       console.error('Error handling MCP request:', err);
+
       if (!res.headersSent) {
         res.status(500).json({
           jsonrpc: '2.0',
@@ -87,21 +90,12 @@ async function main() {
     }
   });
 
-  app.get('/health', (_req: Request, res: Response) => {
-    res.status(200).send('ok');
-  });
-
-  app.listen(PORT, (err?: unknown) => {
-    if (err) {
-      console.error('Failed to start server:', err);
-      process.exit(1);
-    }
-    console.log(`Garmin Connect MCP (HTTP) listening on :${PORT}`);
-    console.log(`MCP endpoint: http://localhost:${PORT}/mcp`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Listening on port ${PORT}`);
   });
 }
 
-main().catch((e) => {
-  console.error('Fatal error starting server:', e);
+main().catch((err) => {
+  console.error(err);
   process.exit(1);
 });
