@@ -1,28 +1,31 @@
 {
   "name": "@nicolasvegam/garmin-connect-mcp",
   "version": "1.1.0",
-  "description": "Garmin Connect MCP Server",
+  "description": "MCP server for Garmin Connect - access fitness, health and training data",
   "type": "module",
-  "main": "build/index.js",
   "bin": {
-    "garmin-connect-mcp": "./build/index.js"
+    "garmin-connect-mcp": "./build/index.js",
+    "garmin-connect-mcp-setup": "./build/setup.js"
   },
   "files": [
     "build"
   ],
   "scripts": {
-    "build": "tsc && chmod +x build/index.js",
-    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "start": "node build/index.js",
-    "setup": "tsx src/cli/setup.ts"
+    "setup": "node build/setup.js",
+    "prepublishOnly": "tsup"
   },
   "keywords": [
-    "mcp",
     "garmin",
     "garmin-connect",
-    "model-context-protocol"
+    "mcp",
+    "model-context-protocol",
+    "fitness",
+    "health",
+    "claude"
   ],
-  "author": "Nicolas Vega",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
@@ -35,8 +38,11 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "@types/node": "^22.10.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "@types/node": "^22.13.4",
+    "@types/tough-cookie": "^4.0.5",
+    "dotenv": "^17.3.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.7.3",
+    "vitest": "^4.0.18"
   }
 }
